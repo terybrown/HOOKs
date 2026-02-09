@@ -58,14 +58,24 @@ export function HeroSection() {
     };
   }, []);
 
-  // Ensure video plays on load
+  // Ensure video plays on load and handle errors
   useEffect(() => {
-    if (videoRef.current && isVideoLoaded) {
-      videoRef.current.play().catch(() => {
-        // Autoplay was prevented, user interaction may be required
+    if (videoRef.current) {
+      videoRef.current.play().catch((error) => {
+        console.log("[v0] Video autoplay prevented:", error);
       });
     }
-  }, [isVideoLoaded]);
+  }, []);
+
+  const handleVideoError = (error: React.SyntheticEvent<HTMLVideoElement>) => {
+    console.log("[v0] Video failed to load:", (error.target as HTMLVideoElement).error);
+    setIsVideoLoaded(false);
+  };
+
+  const handleVideoLoadedData = () => {
+    console.log("[v0] Video loaded successfully");
+    setIsVideoLoaded(true);
+  };
 
   // Text fades out first (0 to 0.2)
   const textOpacity = Math.max(0, 1 - (scrollProgress / 0.2));
@@ -143,11 +153,12 @@ export function HeroSection() {
                 muted
                 loop
                 playsInline
-                onLoadedData={() => setIsVideoLoaded(true)}
+                onLoadedData={handleVideoLoadedData}
+                onError={handleVideoError}
                 className="absolute inset-0 z-0 h-full w-full object-cover"
                 style={{
-                  opacity: isVideoLoaded ? 0.6 : 0,
-                  transition: 'opacity 1s ease-out',
+                  opacity: isVideoLoaded ? 0.7 : 0,
+                  transition: 'opacity 0.5s ease-out',
                 }}
                 src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/27eb7fb4-0105-4010-ac9e-0ac977a31b05_1-FZ89nvBAAsR3caRJbhYv7T2mjBofth.mp4"
               />
