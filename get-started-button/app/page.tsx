@@ -1,4 +1,5 @@
 import { Header } from "@/components/header";
+import { ScrollProgressIndicator } from "@/components/scroll-progress-indicator";
 import { HeroSection } from "@/components/sections/hero-section";
 import { PhilosophySection } from "@/components/sections/philosophy-section";
 import { FeaturedProductsSection } from "@/components/sections/featured-products-section";
@@ -12,6 +13,7 @@ import { FooterSection } from "@/components/sections/footer-section";
 export default function Home() {
   return (
     <main className="min-h-screen bg-background">
+      <ScrollProgressIndicator />
       <Header />
       <HeroSection />
       <PhilosophySection />
