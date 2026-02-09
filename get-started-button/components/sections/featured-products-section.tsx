@@ -1,6 +1,8 @@
 "use client";
 
 import { FadeImage } from "@/components/fade-image";
+import { useScrollAnimation } from "@/hooks/use-scroll-animation";
+import { useRef, useState } from "react";
 
 const features = [
   {
@@ -45,26 +47,91 @@ const features = [
   },
 ];
 
-export function FeaturedProductsSection() {
+function ProductCard({ feature, index, isVisible }: { feature: typeof features[0]; index: number; isVisible: boolean }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    
+    setMousePos({ x, y });
+  };
+
+  const handleMouseLeave = () => {
+    setMousePos({ x: 0.5, y: 0.5 });
+  };
+
+  // Parallax effect based on mouse position
+  const parallaxX = (mousePos.x - 0.5) * 10;
+  const parallaxY = (mousePos.y - 0.5) * 10;
+
   return (
-    <section id="technology" className="relative bg-background py-20 md:py-32">
+    <div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className={`relative overflow-hidden rounded-lg border border-border group cursor-pointer transition-all duration-300 hover:shadow-2xl hover:border-foreground/40 hover:-translate-y-1 ${feature.span} ${
+        isVisible
+          ? 'opacity-100 translate-y-0'
+          : 'opacity-0 translate-y-8'
+      }`}
+      style={{
+        transitionDelay: isVisible ? `${index * 50}ms` : '0ms',
+        transformStyle: 'preserve-3d',
+      }}
+    >
+      <FadeImage
+        src={feature.image || "/placeholder.svg"}
+        alt={`Architecture sketch ${index + 1}`}
+        fill
+        className="object-cover transition-transform duration-500 group-hover:scale-110"
+        style={{
+          transform: `translate3d(${parallaxX}px, ${parallaxY}px, 0)`,
+        }}
+      />
+      {/* Overlay on hover */}
+      <div className="absolute inset-0 bg-gradient-to-t from-foreground/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+    </div>
+  );
+}
+
+export function FeaturedProductsSection() {
+  const { ref, isVisible } = useScrollAnimation();
+
+  return (
+    <section 
+      ref={ref}
+      id="technology" 
+      className="relative bg-background py-20 md:py-32"
+    >
       <div className="px-4 md:px-12 lg:px-20">
+        {/* Section Header with scroll animation */}
+        <div
+          className={`mb-12 transform transition-all duration-700 ${
+            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+        >
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-3">
+            Featured Projects
+          </h2>
+          <p className="text-muted-foreground text-lg max-w-2xl">
+            Hover over any project to see the details and parallax effect
+          </p>
+        </div>
+
         {/* Bento Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 w-full max-w-7xl mx-auto auto-rows-[180px] md:auto-rows-[220px]">
           {features.map((feature, index) => (
-            <div 
-              key={index} 
-              className={`relative overflow-hidden rounded-lg border border-border group cursor-pointer transition-all duration-300 hover:shadow-lg hover:border-foreground/30 ${feature.span}`}
-            >
-              <FadeImage
-                src={feature.image || "/placeholder.svg"}
-                alt={`Architecture sketch ${index + 1}`}
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-              {/* Overlay on hover */}
-              <div className="absolute inset-0 bg-gradient-to-t from-foreground/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </div>
+            <ProductCard
+              key={index}
+              feature={feature}
+              index={index}
+              isVisible={isVisible}
+            />
           ))}
         </div>
       </div>
