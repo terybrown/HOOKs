@@ -149,11 +149,8 @@ export function HeroSection() {
                   opacity: isVideoLoaded ? 0.6 : 0,
                   transition: 'opacity 1s ease-out',
                 }}
-              >
-                <source src="/videos/hero-background.mp4" type="video/mp4" />
-                <source src="/videos/hero-background.webm" type="video/webm" />
-                Your browser does not support the video tag.
-              </video>
+                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/27eb7fb4-0105-4010-ac9e-0ac977a31b05_1-FZ89nvBAAsR3caRJbhYv7T2mjBofth.mp4"
+              />
 
               {/* Text Behind - Fades out first */}
               <div 
