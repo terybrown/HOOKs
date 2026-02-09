@@ -34,7 +34,9 @@ const sideImages = [
 
 export function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -55,6 +57,15 @@ export function HeroSection() {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  // Ensure video plays on load
+  useEffect(() => {
+    if (videoRef.current && isVideoLoaded) {
+      videoRef.current.play().catch(() => {
+        // Autoplay was prevented, user interaction may be required
+      });
+    }
+  }, [isVideoLoaded]);
 
   // Text fades out first (0 to 0.2)
   const textOpacity = Math.max(0, 1 - (scrollProgress / 0.2));
@@ -125,6 +136,25 @@ export function HeroSection() {
                 borderRadius: `${borderRadius}px`,
               }}
             >
+              {/* Video Background Layer */}
+              <video
+                ref={videoRef}
+                autoPlay
+                muted
+                loop
+                playsInline
+                onLoadedData={() => setIsVideoLoaded(true)}
+                className="absolute inset-0 z-0 h-full w-full object-cover"
+                style={{
+                  opacity: isVideoLoaded ? 0.6 : 0,
+                  transition: 'opacity 1s ease-out',
+                }}
+              >
+                <source src="/videos/hero-background.mp4" type="video/mp4" />
+                <source src="/videos/hero-background.webm" type="video/webm" />
+                Your browser does not support the video tag.
+              </video>
+
               {/* Text Behind - Fades out first */}
               <div 
                 className="absolute inset-0 z-0 flex items-center justify-center"
