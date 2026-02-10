@@ -4,19 +4,46 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
+import { AnimatedCTAButton } from "./animated-cta-button";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>("");
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
+
+      // Track active section for nav highlighting
+      const sections = ["hero", "technology", "gallery", "accessories", "about"];
+      for (const section of sections) {
+        const element = document.getElementById(section);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          if (rect.top <= 100 && rect.bottom >= 100) {
+            setActiveSection(section);
+            break;
+          }
+        }
+      }
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const href = e.currentTarget.getAttribute("href");
+    if (!href) return;
+
+    const element = document.querySelector(href);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+      setActiveSection(href.slice(1));
+    }
+  };
 
   return (
     <header 
@@ -35,25 +62,45 @@ export function Header() {
         <nav className="hidden items-center gap-10 md:flex">
           <Link
             href="#technology"
-            className="text-sm transition-colors text-muted-foreground hover:text-foreground"
+            onClick={handleNavClick}
+            className={`text-sm transition-all duration-300 ${
+              activeSection === "technology"
+                ? "text-foreground font-medium"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
           >
             Design
           </Link>
           <Link
             href="#gallery"
-            className="text-sm transition-colors text-muted-foreground hover:text-foreground"
+            onClick={handleNavClick}
+            className={`text-sm transition-all duration-300 ${
+              activeSection === "gallery"
+                ? "text-foreground font-medium"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
           >
             Gallery
           </Link>
           <Link
             href="#accessories"
-            className="text-sm transition-colors text-muted-foreground hover:text-foreground"
+            onClick={handleNavClick}
+            className={`text-sm transition-all duration-300 ${
+              activeSection === "accessories"
+                ? "text-foreground font-medium"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
           >
             Models
           </Link>
           <Link
             href="#about"
-            className="text-sm transition-colors text-muted-foreground hover:text-foreground"
+            onClick={handleNavClick}
+            className={`text-sm transition-all duration-300 ${
+              activeSection === "about"
+                ? "text-foreground font-medium"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
           >
             About
           </Link>
@@ -62,18 +109,12 @@ export function Header() {
         {/* CTA */}
         <div className="hidden items-center gap-4 md:flex">
           <ThemeToggle />
-          <Link
-            href="/auth"
-            className="px-4 py-2 text-sm font-medium transition-all rounded-full text-foreground hover:text-muted-foreground"
-          >
+          <AnimatedCTAButton href="/auth" variant="secondary" showArrow={false}>
             Login
-          </Link>
-          <Link
-            href="/auth"
-            className="px-4 py-2 text-sm font-medium transition-all rounded-full bg-foreground text-background hover:opacity-80"
-          >
+          </AnimatedCTAButton>
+          <AnimatedCTAButton href="/auth" variant="primary">
             Get Started
-          </Link>
+          </AnimatedCTAButton>
         </div>
 
         {/* Mobile Menu Button */}

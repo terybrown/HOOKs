@@ -1,6 +1,7 @@
 "use client";
 
 import { FadeImage } from "@/components/fade-image";
+import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 
 const accessories = [
   {
@@ -27,10 +28,14 @@ const accessories = [
 ];
 
 export function CollectionSection() {
+  const { ref, isVisible } = useScrollAnimation();
+
   return (
-    <section id="accessories" className="bg-background">
-      {/* Section Title */}
-      <div className="px-6 py-20 md:px-12 lg:px-20 md:py-10">
+    <section ref={ref} id="accessories" className="bg-background">
+      {/* Section Title with animation */}
+      <div className={`px-6 py-20 md:px-12 lg:px-20 md:py-10 transform transition-all duration-700 ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+      }`}>
         <h2 className="text-3xl font-medium tracking-tight text-foreground md:text-4xl">
           Surface Options
         </h2>
@@ -40,15 +45,25 @@ export function CollectionSection() {
       <div className="pb-24">
         {/* Mobile: Horizontal Carousel */}
         <div className="flex gap-6 overflow-x-auto px-6 pb-4 md:hidden snap-x snap-mandatory scrollbar-hide">
-          {accessories.map((accessory) => (
-            <div key={accessory.id} className="group flex-shrink-0 w-[75vw] snap-center">
+          {accessories.map((accessory, index) => (
+            <div 
+              key={accessory.id} 
+              className={`group flex-shrink-0 w-[75vw] snap-center transform transition-all duration-700 ${
+                isVisible
+                  ? 'opacity-100 translate-y-0'
+                  : 'opacity-0 translate-y-8'
+              }`}
+              style={{
+                transitionDelay: isVisible ? `${index * 100}ms` : '0ms',
+              }}
+            >
               {/* Image */}
-              <div className="relative aspect-[2/3] overflow-hidden rounded-2xl bg-secondary">
+              <div className="relative aspect-[2/3] overflow-hidden rounded-2xl bg-secondary group-hover:shadow-xl transition-shadow duration-300">
                 <FadeImage
                   src={accessory.image || "/placeholder.svg"}
                   alt={accessory.name}
                   fill
-                  className="object-cover group-hover:scale-105"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
 
@@ -74,15 +89,25 @@ export function CollectionSection() {
 
         {/* Desktop: Grid */}
         <div className="hidden md:grid md:grid-cols-3 gap-8 md:px-12 lg:px-20">
-          {accessories.map((accessory) => (
-            <div key={accessory.id} className="group">
+          {accessories.map((accessory, index) => (
+            <div 
+              key={accessory.id} 
+              className={`group transform transition-all duration-700 ${
+                isVisible
+                  ? 'opacity-100 translate-y-0'
+                  : 'opacity-0 translate-y-8'
+              }`}
+              style={{
+                transitionDelay: isVisible ? `${index * 100}ms` : '0ms',
+              }}
+            >
               {/* Image */}
-              <div className="relative aspect-[2/3] overflow-hidden rounded-2xl bg-secondary">
+              <div className="relative aspect-[2/3] overflow-hidden rounded-2xl bg-secondary group-hover:shadow-xl transition-shadow duration-300">
                 <FadeImage
                   src={accessory.image || "/placeholder.svg"}
                   alt={accessory.name}
                   fill
-                  className="object-cover group-hover:scale-105"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
 
